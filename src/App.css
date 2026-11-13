@@ -544,3 +544,238 @@ footer p {
     transition: none;
   }
 }
+
+
+/* ACTIVIDADES EDUCATIVAS INTERACTIVAS */
+
+.actividad-interactiva {
+  padding: 28px;
+  background: #14171e;
+  border: 1px solid #303440;
+  border-left: 3px solid #a78bfa;
+  border-radius: 4px;
+}
+
+.actividad-titulo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #a3e635;
+  margin-bottom: 16px;
+}
+
+.actividad-titulo h3 {
+  margin: 0;
+  color: #c4b5fd;
+}
+
+.situaciones-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 24px 0;
+}
+
+.situacion-card,
+.escenario-panel {
+  padding: 20px;
+  background: #0e1117;
+  border: 1px solid #303440;
+  border-radius: 4px;
+}
+
+.situacion-card p {
+  margin: 0 0 14px;
+}
+
+.situacion-card strong {
+  color: #a3e635;
+}
+
+.opciones-clasificacion,
+.opciones-decision {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.opciones-decision {
+  flex-direction: column;
+  margin: 20px 0;
+}
+
+.opciones-clasificacion button,
+.opciones-decision button {
+  background: #1b2029;
+  color: #e7e9ee;
+  border: 1px solid #444956;
+  text-align: left;
+}
+
+.opciones-clasificacion button:hover:not(:disabled),
+.opciones-decision button:hover:not(:disabled) {
+  border-color: #a3e635;
+  color: #a3e635;
+}
+
+.opciones-clasificacion .opcion-seleccionada,
+.opciones-decision .opcion-seleccionada {
+  background: #29351c;
+  border-color: #a3e635;
+  color: #a3e635;
+}
+
+.actividad-interactiva button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.contador-actividad {
+  color: #c4b5fd;
+  font-family: "Chakra Petch", sans-serif;
+}
+
+.respuesta-detalle {
+  margin-top: 14px !important;
+  color: #a3e635;
+}
+
+.escenario-panel h4,
+.resultado-actividad h4 {
+  color: #a3e635;
+  font-family: "Chakra Petch", sans-serif;
+  letter-spacing: 1px;
+}
+
+.retroalimentacion,
+.resultado-actividad {
+  padding: 20px;
+  margin-top: 20px;
+  background: #172018;
+  border-left: 3px solid #a3e635;
+}
+
+.retroalimentacion.error {
+  background: #211b2c;
+  border-left-color: #b69cff;
+}
+
+.retroalimentacion.error strong {
+  color: #c4b5fd;
+}
+
+.retroalimentacion.acierto strong {
+  color: #a3e635;
+}
+
+.resultado-actividad button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 600px) {
+  .actividad-interactiva {
+    padding: 18px;
+  }
+
+  .situacion-card,
+  .escenario-panel {
+    padding: 15px;
+  }
+}
+
+
+/* IDENTIFICACIÓN Y REGISTRO DE RESULTADOS */
+
+.registro-estudiante,
+.panel-resultados {
+  background: #14171e;
+  border: 1px solid #303440;
+  border-left: 3px solid #a3e635;
+  border-radius: 4px;
+  padding: 28px;
+}
+
+.registro-encabezado {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #a3e635;
+  margin-bottom: 16px;
+}
+
+.registro-encabezado h2 {
+  margin: 0;
+  color: #c4b5fd;
+}
+
+.registro-estudiante label {
+  display: block;
+  margin: 20px 0 10px;
+  font-weight: 600;
+}
+
+.registro-estudiante input {
+  width: 100%;
+  max-width: 440px;
+  padding: 14px 16px;
+  background: #0e1117;
+  border: 1px solid #444956;
+  border-radius: 4px;
+  color: #e7e9ee;
+  font-family: "DM Sans", sans-serif;
+  font-size: 16px;
+}
+
+.registro-estudiante input:focus {
+  outline: 2px solid #a3e635;
+  outline-offset: 2px;
+}
+
+.estado-guardado {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #a3e635;
+}
+
+.mensaje-registro {
+  padding: 14px;
+  margin: 18px 0;
+  background: #1b2029;
+  border-left: 3px solid #b69cff;
+}
+
+.lista-resultados {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.lista-resultados li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px;
+  background: #0e1117;
+  border: 1px solid #303440;
+}
+
+.lista-resultados strong {
+  color: #c4b5fd;
+}
+
+.lista-resultados span {
+  color: #a3e635;
+  font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .registro-estudiante,
+  .panel-resultados {
+    padding: 18px;
+  }
+}
