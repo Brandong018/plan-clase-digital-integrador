@@ -1,3 +1,4 @@
+/* global process */
 
 const NOCODB_URL =
   "https://app.nocodb.com/api/v3/data/p3lg0mennyh9nr2/mtsmwu72ng2cyr8/records";
@@ -13,6 +14,7 @@ export default async function handler(req, res) {
 
   if (!["GET", "POST"].includes(req.method)) {
     res.setHeader("Allow", "GET, POST");
+
     return res.status(405).json({
       error: "Método no permitido.",
     });
@@ -56,11 +58,13 @@ export default async function handler(req, res) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          Estudiante: Estudiante.trim(),
-          Actividad: Actividad.trim(),
-          Aciertos,
-          Total,
-          Fecha: new Date().toISOString(),
+          fields: {
+            Estudiante: Estudiante.trim(),
+            Actividad: Actividad.trim(),
+            Aciertos,
+            Total,
+            Fecha: new Date().toISOString(),
+          },
         }),
       });
     }
@@ -77,9 +81,13 @@ export default async function handler(req, res) {
     }
 
     const datos = await respuesta.json();
+
     return res.status(200).json(datos);
   } catch (error) {
-    console.error("Error de conexión:", error.message);
+    console.error(
+      "Error de conexión:",
+      error.message
+    );
 
     return res.status(500).json({
       error: "No se pudo establecer conexión con NocoDB.",
