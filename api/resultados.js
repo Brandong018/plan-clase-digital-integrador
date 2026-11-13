@@ -1,3 +1,4 @@
+
 /* global process */
 
 const NOCODB_URL =
@@ -24,7 +25,26 @@ export default async function handler(req, res) {
     let respuesta;
 
     if (req.method === "GET") {
-      respuesta = await fetch(NOCODB_URL, {
+      const estudiante = req.query.estudiante;
+
+      if (
+        typeof estudiante !== "string" ||
+        !estudiante.trim() ||
+        estudiante.length > 80
+      ) {
+        return res.status(400).json({
+          error: "Debes indicar un alias válido.",
+        });
+      }
+
+      const url = new URL(NOCODB_URL);
+
+      url.searchParams.set(
+        "where",
+        `(Estudiante,eq,${estudiante.trim()})`
+      );
+
+      respuesta = await fetch(url.toString(), {
         headers: {
           "xc-token": token,
         },

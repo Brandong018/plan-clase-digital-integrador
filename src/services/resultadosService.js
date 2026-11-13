@@ -1,11 +1,11 @@
 
 const API_URL = "/api/resultados";
 
-async function solicitarAPI(opciones = {}) {
+async function solicitarAPI(opciones = {}, url = API_URL) {
   let respuesta;
 
   try {
-    respuesta = await fetch(API_URL, opciones);
+    respuesta = await fetch(url, opciones);
   } catch {
     throw new Error(
       "No se pudo conectar con el servidor. Revisa tu conexión."
@@ -17,7 +17,9 @@ async function solicitarAPI(opciones = {}) {
   try {
     datos = await respuesta.json();
   } catch {
-    throw new Error("El servidor devolvió una respuesta no válida.");
+    throw new Error(
+      "El servidor devolvió una respuesta no válida."
+    );
   }
 
   if (!respuesta.ok) {
@@ -39,6 +41,19 @@ export async function guardarResultado(resultado) {
   });
 }
 
-export async function obtenerResultados() {
-  return solicitarAPI();
+export async function obtenerResultados(estudiante) {
+  const alias = estudiante.trim();
+
+  if (!alias) {
+    return { records: [] };
+  }
+
+  const parametros = new URLSearchParams({
+    estudiante: alias,
+  });
+
+  return solicitarAPI(
+    {},
+    `${API_URL}?${parametros.toString()}`
+  );
 }
