@@ -1,7 +1,11 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { UserRound, Database, LoaderCircle } from "lucide-react";
+import {
+  UserRound,
+  Database,
+  LoaderCircle,
+} from "lucide-react";
 
 import "./App.css";
 
@@ -11,7 +15,10 @@ import EvaluacionForm from "./components/EvaluacionForm";
 import ActividadClasificacion from "./components/ActividadClasificacion";
 import ActividadDecisiones from "./components/ActividadDecisiones";
 
-import { guardarResultado } from "./services/resultadosService";
+import {
+  guardarResultado,
+  obtenerResultados,
+} from "./services/resultadosService";
 
 const animacionSeccion = {
   initial: { opacity: 0, y: 28 },
@@ -23,11 +30,76 @@ const animacionSeccion = {
 function App() {
   const [estudiante, setEstudiante] = useState("");
   const [guardando, setGuardando] = useState(false);
+  const [consultando, setConsultando] = useState(false);
   const [mensaje, setMensaje] = useState("");
   const [resultados, setResultados] = useState([]);
+  const [errorConsulta, setErrorConsulta] = useState("");
 
-  async function registrarResultado(actividad, aciertos, total) {
-    if (!estudiante.trim()) {
+  useEffect(() => {
+    const alias = estudiante.trim();
+
+    if (!alias) {
+      return;
+    }
+
+    let vigente = true;
+
+    async function consultarHistorial() {
+      setConsultando(true);
+      setErrorConsulta("");
+
+      try {
+        const datos = await obtenerResultados(alias);
+
+        if (!vigente) {
+          return;
+        }
+
+        const registros = (datos.records ?? [])
+          .filter(
+            (registro) =>
+              registro.fields?.Estudiante === alias
+          )
+          .map((registro) => ({
+            id: registro.id,
+            actividad: registro.fields.Actividad,
+            aciertos: registro.fields.Aciertos,
+            total: registro.fields.Total,
+          }));
+
+        setResultados(registros);
+      } catch (error) {
+        if (vigente) {
+          setErrorConsulta(
+            `No se pudo recuperar el historial: ${error.message}`
+          );
+        }
+      } finally {
+        if (vigente) {
+          setConsultando(false);
+        }
+      }
+    }
+
+    const temporizador = setTimeout(
+      consultarHistorial,
+      500
+    );
+
+    return () => {
+      vigente = false;
+      clearTimeout(temporizador);
+    };
+  }, [estudiante]);
+
+  async function registrarResultado(
+    actividad,
+    aciertos,
+    total
+  ) {
+    const alias = estudiante.trim();
+
+    if (!alias) {
       setMensaje(
         "Escribe tu alias antes de guardar los resultados."
       );
@@ -38,16 +110,23 @@ function App() {
     setMensaje("");
 
     try {
-      await guardarResultado({
-        Estudiante: estudiante.trim(),
+      const registro = await guardarResultado({
+        Estudiante: alias,
         Actividad: actividad,
         Aciertos: aciertos,
         Total: total,
       });
 
+      const nuevoResultado = {
+        id: registro.id ?? Date.now(),
+        actividad,
+        aciertos,
+        total,
+      };
+
       setResultados((anteriores) => [
         ...anteriores,
-        { actividad, aciertos, total },
+        nuevoResultado,
       ]);
 
       setMensaje(
@@ -90,20 +169,30 @@ function App() {
           </h2>
 
           <p>
-            La seguridad digital consiste en utilizar herramientas
-            tecnológicas de manera responsable, protegiendo nuestra
-            información personal y evitando riesgos en Internet.
+            La seguridad digital consiste en utilizar
+            herramientas tecnológicas de manera responsable,
+            protegiendo nuestra información personal y
+            evitando riesgos en Internet.
           </p>
 
           <h3>Recomendaciones importantes</h3>
 
           <ul>
-            <li>Utiliza contraseñas seguras y privadas.</li>
-            <li>No compartas información personal con desconocidos.</li>
-            <li>Evita abrir enlaces sospechosos.</li>
-            <li>Respeta a otras personas en los espacios digitales.</li>
             <li>
-              Consulta con un adulto de confianza ante situaciones de riesgo.
+              Utiliza contraseñas seguras y privadas.
+            </li>
+            <li>
+              No compartas información personal con desconocidos.
+            </li>
+            <li>
+              Evita abrir enlaces sospechosos.
+            </li>
+            <li>
+              Respeta a otras personas en los espacios digitales.
+            </li>
+            <li>
+              Consulta con un adulto de confianza ante
+              situaciones de riesgo.
             </li>
           </ul>
         </motion.section>
@@ -114,7 +203,10 @@ function App() {
           className="registro-estudiante"
         >
           <div className="registro-encabezado">
-            <UserRound size={26} aria-hidden="true" />
+            <UserRound
+              size={26}
+              aria-hidden="true"
+            />
             <h2 id="registro-titulo">
               Identificación del estudiante
             </h2>
@@ -133,9 +225,12 @@ function App() {
             id="alias-estudiante"
             type="text"
             value={estudiante}
-            onChange={(evento) =>
-              setEstudiante(evento.target.value)
-            }
+            onChange={(evento) => {
+              setEstudiante(evento.target.value);
+              setResultados([]);
+              setErrorConsulta("");
+              setMensaje("");
+            }}
             placeholder="Ejemplo: Estudiante 01"
             maxLength={80}
             autoComplete="off"
@@ -184,42 +279,82 @@ function App() {
           className="panel-resultados"
         >
           <div className="registro-encabezado">
-            <Database size={26} aria-hidden="true" />
+            <Database
+              size={26}
+              aria-hidden="true"
+            />
             <h2 id="resultados-titulo">
               Registro de resultados
             </h2>
           </div>
 
+          {consultando && (
+            <p
+              className="estado-guardado"
+              role="status"
+            >
+              <LoaderCircle
+                size={18}
+                aria-hidden="true"
+              />
+              Consultando resultados anteriores...
+            </p>
+          )}
+
           {guardando && (
-            <p className="estado-guardado" role="status">
-              <LoaderCircle size={18} aria-hidden="true" />
+            <p
+              className="estado-guardado"
+              role="status"
+            >
+              <LoaderCircle
+                size={18}
+                aria-hidden="true"
+              />
               Guardando resultado...
             </p>
           )}
 
           {mensaje && (
-            <p className="mensaje-registro" role="status">
+            <p
+              className="mensaje-registro"
+              role="status"
+            >
               {mensaje}
             </p>
           )}
 
-          {resultados.length > 0 ? (
+          {errorConsulta && (
+            <p
+              className="mensaje-registro"
+              role="alert"
+            >
+              {errorConsulta}
+            </p>
+          )}
+
+          {!estudiante.trim() ? (
+            <p>
+              Escribe tu alias para consultar tus resultados.
+            </p>
+          ) : resultados.length > 0 ? (
             <ul className="lista-resultados">
-              {resultados.map((resultado, indice) => (
-                <li key={indice}>
-                  <strong>{resultado.actividad}</strong>
+              {resultados.map((resultado) => (
+                <li key={resultado.id}>
+                  <strong>
+                    {resultado.actividad}
+                  </strong>
                   <span>
                     {resultado.aciertos}/{resultado.total}
                   </span>
                 </li>
               ))}
             </ul>
-          ) : (
+          ) : !consultando && !errorConsulta ? (
             <p>
-              Todavía no hay resultados guardados durante
-              esta visita.
+              Todavía no hay resultados registrados
+              para este alias.
             </p>
-          )}
+          ) : null}
         </motion.section>
       </main>
 
