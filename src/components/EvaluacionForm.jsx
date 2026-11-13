@@ -1,18 +1,33 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, AlertTriangle, ShieldCheck } from "lucide-react";
+import {
+  CheckCircle2,
+  AlertTriangle,
+  ShieldCheck,
+} from "lucide-react";
 
-function EvaluacionForm() {
+function EvaluacionForm({ onCompletar }) {
   const [respuesta, setRespuesta] = useState("");
   const [resultado, setResultado] = useState(null);
+  const [registrado, setRegistrado] = useState(false);
 
   function verificarRespuesta(evento) {
     evento.preventDefault();
 
     if (!respuesta) return;
 
-    setResultado(respuesta === "correcta" ? "correcto" : "incorrecto");
+    const esCorrecta = respuesta === "correcta";
+
+    setResultado(
+      esCorrecta ? "correcto" : "incorrecto"
+    );
+
+    // Registrar únicamente cuando la respuesta sea correcta.
+    if (esCorrecta && !registrado) {
+      setRegistrado(true);
+      onCompletar?.(1, 1);
+    }
   }
 
   function cambiarRespuesta(evento) {
@@ -43,13 +58,18 @@ function EvaluacionForm() {
           onChange={cambiarRespuesta}
           required
         >
-          <option value="">Selecciona una respuesta</option>
+          <option value="">
+            Selecciona una respuesta
+          </option>
+
           <option value="incorrecta1">
             Compartir la contraseña para verificar mi cuenta
           </option>
+
           <option value="correcta">
             No compartirla y reportar el mensaje
           </option>
+
           <option value="incorrecta2">
             Abrir todos los enlaces del mensaje
           </option>
@@ -87,9 +107,15 @@ function EvaluacionForm() {
           >
             <div className="resultado-icono">
               {resultado === "correcto" ? (
-                <CheckCircle2 size={30} aria-hidden="true" />
+                <CheckCircle2
+                  size={30}
+                  aria-hidden="true"
+                />
               ) : (
-                <AlertTriangle size={30} aria-hidden="true" />
+                <AlertTriangle
+                  size={30}
+                  aria-hidden="true"
+                />
               )}
             </div>
 

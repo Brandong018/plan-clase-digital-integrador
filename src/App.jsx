@@ -270,7 +270,17 @@ function App() {
           {...animacionSeccion}
           className="seccion-animada"
         >
-          <EvaluacionForm />
+          
+<EvaluacionForm
+  onCompletar={(aciertos, total) =>
+    registrarResultado(
+      "Mini evaluación",
+      aciertos,
+      total
+    )
+  }
+/>
+
         </motion.div>
 
         <motion.section
